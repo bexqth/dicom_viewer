@@ -5,11 +5,9 @@ class info_panel(Frame):
         # Voláme super PRED konfiguráciou
         super().__init__(parent, **kw)
         
-        # Farby - tmavá schéma
         self.primary_color = "#57534D"
         self.text_light = "#ecf0f1"      
         
-        # Svetlý text pre všetky labely
         self.text_color = self.text_light
         self.labels = []
         
