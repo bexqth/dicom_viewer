@@ -6,8 +6,8 @@ class info_panel(Frame):
         super().__init__(parent, **kw)
         
         # Farby - tmavá schéma
-        self.primary_color = "#57534D"    # Tmavá modrá
-        self.text_light = "#ecf0f1"       # Svetlý text na tmavom pozadí
+        self.primary_color = "#57534D"
+        self.text_light = "#ecf0f1"      
         
         # Svetlý text pre všetky labely
         self.text_color = self.text_light
@@ -17,13 +17,11 @@ class info_panel(Frame):
         self.set_layout()
 
     def create_labels(self):
-        # Nadpis s väčším písmom
         title_label = Label(self, text="Patient Information", 
                            bg=self.cget("bg"), fg="white",
                            font=("Segoe UI", 18, "bold"))  # Zväčšené písmo
         title_label.grid(row=0, column=0, sticky="w", padx=15, pady=(15, 20))
      
-        # Labely pre hodnoty - väčšie písmo
         names = ["Patient Name", "Patient ID", "Modality", "Study Date", "Image Size"]
         for i in range(len(names)):
             label = Label(self, text=names[i] + ": --", 
