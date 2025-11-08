@@ -2,7 +2,6 @@ from tkinter import Frame, Label
 
 class info_panel(Frame):
     def __init__(self, parent, **kw):
-        # Voláme super PRED konfiguráciou
         super().__init__(parent, **kw)
         
         self.primary_color = "#57534D"
