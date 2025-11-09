@@ -27,8 +27,15 @@ class dicom_loader:
         self.patient_name = self.dataset.PatientName 
         self.patient_id = self.dataset.PatientID
         self.modality = self.dataset.Modality
-        self.study_date = self.dataset.StudyDate
-        self.image_size =  "{ds.Rows} x {ds.Columns}"
+        date_str = str(self.dataset.StudyDate)
+        if len(date_str) == 8:
+            year = date_str[0:4]
+            month = date_str[4:6]
+            day = date_str[6:8]
+            self.study_date = f"{day}.{month}.{year}"
+        else:
+            self.study_date = date_str 
+        self.image_size =  f"{self.dataset.Rows} x {self.dataset.Columns}"
 
     def get_tk_image(self):
         return self.tk_image
