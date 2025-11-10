@@ -22,30 +22,35 @@ class viewer_app:
         self.window.grid_rowconfigure(0, weight=0)
         self.window.grid_rowconfigure(1, weight=1)
 
+        self.dicom_files = []
+        self.current_index = -1
+        self.loaders = []
+
         self.set_layout()
         self.set_buttons()
 
     def open_file(self):
-        filepath = filedialog.askopenfilename()
-        if filepath:
-            loader = dicom_loader()
-            loader.load_dicom_image(filepath)
-            loader.set_patient_info() 
+        filepaths = filedialog.askopenfilenames(
+            title="Vyber DICOM súbory",
+            filetypes=[("DICOM Files", "*.dcm"), ("All Files", "*.*")]
+        )
 
-            self.window.update_idletasks()
-
-            width = self.data_frame.winfo_width()
-            height = self.data_frame.winfo_height()
-            self.image_panel.display_dicom_image(loader.image, width, height)
+        if filepaths:
+            self.dicom_files = []
+            self.loaders = []
             
-            info = [
-                "Name: " + str(loader.get_patient_name()),
-                "ID: " + str(loader.get_patient_id()),
-                "Modality: " +  str(loader.get_modality()),
-                "Date: " + str(loader.get_study_date()),
-                "Size: " + str(loader.get_image_size())
-            ]
-            self.info_panel.update_info(info)
+            for path in filepaths:
+                self.dicom_files.append(path)
+                loader = dicom_loader()
+                loader.load_dicom_image(path)
+                loader.set_patient_info()
+                self.loaders.append(loader) 
+
+            self.dicom_files.sort()
+            self.current_index = 0
+            self.display_current_image()
+            self.update_button_state()
+
 
     def set_layout(self):
         self.button_frame = Frame(self.window, bg=self.primary_color, height=45)
@@ -65,6 +70,37 @@ class viewer_app:
         
         self.window.update_idletasks()
 
+    def display_current_image(self):
+        if len(self.dicom_files) == 0 or self.current_index < 0:
+            return
+        loader = self.loaders[self.current_index]
+        
+        self.window.update_idletasks()
+        width = self.data_frame.winfo_width()
+        height = self.data_frame.winfo_height()
+        self.image_panel.display_dicom_image(loader.image, width, height)
+
+        info = [
+            "Name: " + str(loader.get_patient_name()),
+            "ID: " + str(loader.get_patient_id()),
+            "Modality: " + str(loader.get_modality()),
+            "Date: " + str(loader.get_study_date()),
+            "Size: " + str(loader.get_image_size())
+        ]
+        self.info_panel.update_info(info)
+
+    def next_image(self):
+        if self.current_index < len(self.dicom_files) - 1:
+            self.current_index += 1
+            self.display_current_image()
+            self.update_button_state()
+
+    def prev_image(self):
+        if self.current_index > 0:
+            self.current_index -= 1
+            self.display_current_image()
+            self.update_button_state()
+
     def set_buttons(self):
         open_button = Button(self.button_frame, 
                            text="Open DICOM", 
@@ -72,6 +108,20 @@ class viewer_app:
                            command=self.open_file,
                            font=("Segoe UI", 10, "bold"))
         open_button.pack(side="left", padx=15, pady=8)
+
+        self.prev_button = Button(self.button_frame,
+                               text="←",
+                               highlightbackground=self.primary_color,
+                               command=self.prev_image,
+                               font=("Segoe UI", 10, "bold"))
+        self.prev_button.pack(side="left", padx=5, pady=8)
+        
+        self.next_button = Button(self.button_frame,
+                               text="→",
+                               highlightbackground=self.primary_color,
+                               command=self.next_image,
+                               font=("Segoe UI", 10, "bold"))
+        self.next_button.pack(side="left", padx=5, pady=8)
 
     def run(self):
         self.window.mainloop()
