@@ -1,4 +1,4 @@
-from tkinter import Tk, Frame, Button, filedialog, PhotoImage
+from tkinter import Tk, Frame, Button, filedialog, PhotoImage, Label
 from dicom_loader import dicom_loader
 from image_panel import image_panel
 from info_panel import info_panel
@@ -38,7 +38,7 @@ class viewer_app:
         if filepaths:
             self.dicom_files = []
             self.loaders = []
-            
+
             for path in filepaths:
                 self.dicom_files.append(path)
                 loader = dicom_loader()
@@ -49,8 +49,6 @@ class viewer_app:
             self.dicom_files.sort()
             self.current_index = 0
             self.display_current_image()
-            self.update_button_state()
-
 
     def set_layout(self):
         self.button_frame = Frame(self.window, bg=self.primary_color, height=45)
@@ -88,18 +86,23 @@ class viewer_app:
             "Size: " + str(loader.get_image_size())
         ]
         self.info_panel.update_info(info)
+        self.update_index_label()
+
+    def update_index_label(self):
+        if len(self.dicom_files) > 0:
+            self.index_label.config(text=f"Fotka {self.current_index + 1} / {len(self.dicom_files)}")
+        else:
+            self.index_label.config(text="No pictures")
 
     def next_image(self):
         if self.current_index < len(self.dicom_files) - 1:
             self.current_index += 1
             self.display_current_image()
-            self.update_button_state()
 
     def prev_image(self):
         if self.current_index > 0:
             self.current_index -= 1
             self.display_current_image()
-            self.update_button_state()
 
     def set_buttons(self):
         open_button = Button(self.button_frame, 
@@ -122,6 +125,14 @@ class viewer_app:
                                command=self.next_image,
                                font=("Segoe UI", 10, "bold"))
         self.next_button.pack(side="left", padx=5, pady=8)
+
+        self.index_label = Label(self.button_frame, 
+                                  text="Žiadne fotky", 
+                                  bg=self.primary_color, 
+                                  fg="white",
+                                  font=("Segoe UI", 10))
+        self.index_label.pack(side="left", padx=20, pady=8)
+
 
     def run(self):
         self.window.mainloop()
